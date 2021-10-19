@@ -15,10 +15,9 @@ def searchInputTransaction(thash):
     
       for i in range(0,reslen):
        lineArray=lines[i].split("\t")
-     # To Do :-- check for index at 4,6 for other  as well
-       if(lineArray[2]==thash):
-         #used inputTransaction Array to hold different input transactions of given Transaction
-        inputTransactionsArray.append(lineArray[1])
+       if(thash in lineArray):
+         #used inputTransaction Array to hold different input transactions of given Transaction hash of Output file
+        inputTransactionsArray.append(lineArray)
         
     return inputTransactionsArray
    
