@@ -1,0 +1,108 @@
+<html>
+<head>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.16.1/vis.css" type="text/css" />
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.16.1/vis-network.min.js"> </script>
+<center>
+<h1></h1>
+</center>
+
+<!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
+<script type="text/javascript" src="../node_modules/vis/dist/vis.js"> </script>-->
+
+<style type="text/css">
+
+        #mynetwork {
+            width: 500px;
+            height: 500px;
+            background-color: #ffffff;
+            border: 1px solid lightgray;
+            position: relative;
+            float: left;
+        }
+
+        
+
+        
+
+        
+</style>
+
+</head>
+
+<body>
+<div id = "mynetwork"></div>
+
+
+<script type="text/javascript">
+
+    // initialize global variables.
+    var edges;
+    var nodes;
+    var network; 
+    var container;
+    var options, data;
+
+    
+    // This method is responsible for drawing the graph, returns the drawn network
+    function drawGraph() {
+        var container = document.getElementById('mynetwork');
+        
+        
+
+        // parsing and collecting nodes and edges from the python
+        nodes = new vis.DataSet([{"color": "r", "id": "58703", "label": "transaction", "s": "s", "shape": "dot", "size": 10}, {"color": "b", "id": "17DC6Fxidja2DN7oHTVgfx3uQ4KGArYEwg", "label": "address", "s": "s", "shape": "dot", "size": 10}, {"color": "r", "id": "51115", "label": "transaction", "s": "s", "shape": "dot", "size": 10}, {"color": "b", "id": "15d2mzoiz9HjTB1EPTp6Jg87s2tqgNQTSB", "label": "address", "s": "s", "shape": "dot", "size": 10}, {"color": "r", "id": "95892", "label": "transaction", "s": "s", "shape": "dot", "size": 10}, {"color": "b", "id": "noaddress", "label": "address", "s": "s", "shape": "dot", "size": 10}, {"color": "r", "id": "116974", "label": "transaction", "s": "s", "shape": "dot", "size": 10}, {"color": "r", "id": "81288", "label": "transaction", "s": "o", "shape": "dot", "size": 10}, {"color": "r", "id": "68918", "label": "transaction", "s": "s", "shape": "dot", "size": 10}, {"color": "r", "id": "87114", "label": "transaction", "s": "o", "shape": "dot", "size": 10}, {"color": "r", "id": "111723", "label": "transaction", "s": "s", "shape": "dot", "size": 10}, {"color": "r", "id": "13126", "label": "transaction", "s": "s", "shape": "dot", "size": 10}, {"color": "r", "id": "65218", "label": "transaction", "s": "o", "shape": "dot", "size": 10}, {"color": "r", "id": "106227", "label": "transaction", "s": "o", "shape": "dot", "size": 10}, {"color": "r", "id": "107644", "label": "transaction", "s": "o", "shape": "dot", "size": 10}, {"color": "r", "id": "5155", "label": "transaction", "s": "s", "shape": "dot", "size": 10}, {"color": "r", "id": "96427", "label": "transaction", "s": "o", "shape": "dot", "size": 10}, {"color": "r", "id": "28659", "label": "transaction", "s": "s", "shape": "dot", "size": 10}, {"color": "b", "id": "4900000000", "label": "address", "s": "s", "shape": "dot", "size": 10}, {"color": "r", "id": "44059", "label": "transaction", "s": "s", "shape": "dot", "size": 10}, {"color": "b", "id": "19uf6F6EDijkH4ZUaqsi3pZ2SVD6A5RG8X", "label": "address", "s": "s", "shape": "dot", "size": 10}, {"color": "r", "id": "26148", "label": "transaction", "s": "s", "shape": "dot", "size": 10}, {"color": "b", "id": "4800000000", "label": "address", "s": "s", "shape": "dot", "size": 10}, {"color": "r", "id": "40668", "label": "transaction", "s": "s", "shape": "dot", "size": 10}, {"color": "r", "id": "18667", "label": "transaction", "s": "o", "shape": "dot", "size": 10}, {"color": "r", "id": "44290", "label": "transaction", "s": "s", "shape": "dot", "size": 10}, {"color": "r", "id": "37237", "label": "transaction", "s": "o", "shape": "dot", "size": 10}, {"color": "b", "id": "1M76MmkkZbTsu2CBmx7QQPH9NsaVprBqxv", "label": "address", "s": "s", "shape": "dot", "size": 10}, {"color": "b", "id": "18678RbdxmLrQQ5cn2Dwohdk4E2EziTbmb", "label": "address", "s": "s", "shape": "dot", "size": 10}, {"color": "r", "id": "101405", "label": "transaction", "s": "o", "shape": "dot", "size": 10}, {"color": "r", "id": "90181", "label": "transaction", "s": "s", "shape": "dot", "size": 10}, {"color": "b", "id": "19BZkKomveRn1NojEyXhZDWgrsnz5ZGkmJ", "label": "address", "s": "s", "shape": "dot", "size": 10}, {"color": "r", "id": "4987", "label": "transaction", "s": "o", "shape": "dot", "size": 10}, {"color": "r", "id": "663", "label": "transaction", "s": "s", "shape": "dot", "size": 10}, {"color": "r", "id": "29792", "label": "transaction", "s": "s", "shape": "dot", "size": 10}, {"color": "r", "id": "75733", "label": "transaction", "s": "s", "shape": "dot", "size": 10}, {"color": "r", "id": "6367", "label": "transaction", "s": "s", "shape": "dot", "size": 10}, {"color": "r", "id": "67420", "label": "transaction", "s": "s", "shape": "dot", "size": 10}, {"color": "r", "id": "114716", "label": "transaction", "s": "s", "shape": "dot", "size": 10}, {"color": "r", "id": "103202", "label": "transaction", "s": "s", "shape": "dot", "size": 10}, {"color": "r", "id": "30287", "label": "transaction", "s": "s", "shape": "dot", "size": 10}, {"color": "r", "id": "79421", "label": "transaction", "s": "s", "shape": "dot", "size": 10}, {"color": "r", "id": "48502", "label": "transaction", "s": "s", "shape": "dot", "size": 10}, {"color": "r", "id": "90062", "label": "transaction", "s": "s", "shape": "dot", "size": 10}, {"color": "r", "id": "43301", "label": "transaction", "s": "s", "shape": "dot", "size": 10}, {"color": "r", "id": "55870", "label": "transaction", "s": "s", "shape": "dot", "size": 10}, {"color": "r", "id": "106053", "label": "transaction", "s": "s", "shape": "dot", "size": 10}, {"color": "r", "id": "99598", "label": "transaction", "s": "s", "shape": "dot", "size": 10}, {"color": "b", "id": "16m9YMoDrsrk83VygtsunHRb14irKqdcdH", "label": "address", "s": "s", "shape": "dot", "size": 10}, {"color": "r", "id": "56096", "label": "transaction", "s": "s", "shape": "dot", "size": 10}, {"color": "b", "id": "1683000000", "label": "address", "s": "s", "shape": "dot", "size": 10}, {"color": "r", "id": "64213", "label": "transaction", "s": "s", "shape": "dot", "size": 10}, {"color": "b", "id": "5000000000", "label": "address", "s": "s", "shape": "dot", "size": 10}, {"color": "b", "id": "16DNNJzA4FX5f3so2qpcotc2xQv8DGhQV7", "label": "address", "s": "s", "shape": "dot", "size": 10}, {"color": "r", "id": "81722", "label": "transaction", "s": "s", "shape": "dot", "size": 10}, {"color": "r", "id": "27140", "label": "transaction", "s": "s", "shape": "dot", "size": 10}, {"color": "b", "id": "2500000000", "label": "address", "s": "s", "shape": "dot", "size": 10}, {"color": "r", "id": "30786", "label": "transaction", "s": "s", "shape": "dot", "size": 10}, {"color": "b", "id": "1GNyLtivKQrL32S31WswWKVhSvUugGoq9S", "label": "address", "s": "s", "shape": "dot", "size": 10}, {"color": "r", "id": "84269", "label": "transaction", "s": "s", "shape": "dot", "size": 10}, {"color": "b", "id": "1EqbGHoZZ7xdCkiQXW53UWrueQgfGiJDVG", "label": "address", "s": "s", "shape": "dot", "size": 10}, {"color": "r", "id": "59376", "label": "transaction", "s": "o", "shape": "dot", "size": 10}, {"color": "r", "id": "29857", "label": "transaction", "s": "o", "shape": "dot", "size": 10}, {"color": "r", "id": "92262", "label": "transaction", "s": "s", "shape": "dot", "size": 10}, {"color": "r", "id": "56367", "label": "transaction", "s": "s", "shape": "dot", "size": 10}, {"color": "b", "id": "1JXFXUBGs2ZtEDAQMdZ3tkCKo38nT2XSEp", "label": "address", "s": "s", "shape": "dot", "size": 10}, {"color": "r", "id": "5669", "label": "transaction", "s": "o", "shape": "dot", "size": 10}, {"color": "r", "id": "33845", "label": "transaction", "s": "o", "shape": "dot", "size": 10}, {"color": "r", "id": "47339", "label": "transaction", "s": "o", "shape": "dot", "size": 10}, {"color": "b", "id": "1EGDbCKGbizMFgwjn4WNHTvAthsvrsixDv", "label": "address", "s": "s", "shape": "dot", "size": 10}, {"color": "r", "id": "34538", "label": "transaction", "s": "s", "shape": "dot", "size": 10}, {"color": "r", "id": "69449", "label": "transaction", "s": "o", "shape": "dot", "size": 10}, {"color": "r", "id": "13528", "label": "transaction", "s": "s", "shape": "dot", "size": 10}, {"color": "r", "id": "85422", "label": "transaction", "s": "s", "shape": "dot", "size": 10}, {"color": "b", "id": "1CYdgs3YcoLtf8g9ii7KiPjPMxUrfE6jg1", "label": "address", "s": "s", "shape": "dot", "size": 10}, {"color": "r", "id": "39381", "label": "transaction", "s": "s", "shape": "dot", "size": 10}, {"color": "b", "id": "1383726000000", "label": "address", "s": "s", "shape": "dot", "size": 10}, {"color": "b", "id": "93000000", "label": "address", "s": "s", "shape": "dot", "size": 10}, {"color": "r", "id": "41083", "label": "transaction", "s": "o", "shape": "dot", "size": 10}, {"color": "r", "id": "46403", "label": "transaction", "s": "o", "shape": "dot", "size": 10}, {"color": "r", "id": "46005", "label": "transaction", "s": "s", "shape": "dot", "size": 10}, {"color": "r", "id": "1522", "label": "transaction", "s": "s", "shape": "dot", "size": 10}, {"color": "b", "id": "4998000000", "label": "address", "s": "s", "shape": "dot", "size": 10}, {"color": "b", "id": "4997000000", "label": "address", "s": "s", "shape": "dot", "size": 10}, {"color": "r", "id": "90421", "label": "transaction", "s": "o", "shape": "dot", "size": 10}, {"color": "r", "id": "87030", "label": "transaction", "s": "s", "shape": "dot", "size": 10}, {"color": "b", "id": "14rnn1tqFmbmBfHA775rubZAqJ82SyGwwf", "label": "address", "s": "s", "shape": "dot", "size": 10}, {"color": "r", "id": "41406", "label": "transaction", "s": "o", "shape": "dot", "size": 10}, {"color": "r", "id": "108417", "label": "transaction", "s": "s", "shape": "dot", "size": 10}, {"color": "b", "id": "100000000", "label": "address", "s": "s", "shape": "dot", "size": 10}, {"color": "r", "id": "36246", "label": "transaction", "s": "o", "shape": "dot", "size": 10}, {"color": "r", "id": "64473", "label": "transaction", "s": "o", "shape": "dot", "size": 10}, {"color": "r", "id": "63869", "label": "transaction", "s": "s", "shape": "dot", "size": 10}, {"color": "b", "id": "19FkhipC2hiTeg8QUEie4rG4uTTknGWBiH", "label": "address", "s": "s", "shape": "dot", "size": 10}, {"color": "r", "id": "30040", "label": "transaction", "s": "o", "shape": "dot", "size": 10}, {"color": "r", "id": "92719", "label": "transaction", "s": "s", "shape": "dot", "size": 10}]);
+        edges = new vis.DataSet([{"from": "58703", "to": "17DC6Fxidja2DN7oHTVgfx3uQ4KGArYEwg", "weight": 25000000000}, {"from": "17DC6Fxidja2DN7oHTVgfx3uQ4KGArYEwg", "to": "51115", "weight": 25000000000}, {"from": "51115", "to": "15d2mzoiz9HjTB1EPTp6Jg87s2tqgNQTSB", "weight": 65000000000}, {"from": "95892", "to": "noaddress", "weight": 4999000000}, {"from": "noaddress", "to": "116974", "weight": 4999000000}, {"from": "noaddress", "to": "81288", "weight": 4900000000}, {"from": "noaddress", "to": "68918", "weight": 4900000000}, {"from": "noaddress", "to": "87114", "weight": 4800000000}, {"from": "noaddress", "to": "111723", "weight": 190000000000}, {"from": "noaddress", "to": "13126", "weight": 2500000000}, {"from": "noaddress", "to": "65218", "weight": 4998000000}, {"from": "noaddress", "to": "106227", "weight": 1383726000000}, {"from": "noaddress", "to": "107644", "weight": 4900000000}, {"from": "noaddress", "to": "5155", "weight": 4998000000}, {"from": "noaddress", "to": "96427", "weight": 1683000000}, {"from": "28659", "to": "noaddress", "weight": 4900000000}, {"from": "28659", "to": "4900000000", "weight": 100000000}, {"from": "15d2mzoiz9HjTB1EPTp6Jg87s2tqgNQTSB", "to": "44059", "weight": 65000000000}, {"from": "44059", "to": "19uf6F6EDijkH4ZUaqsi3pZ2SVD6A5RG8X", "weight": 65000000000}, {"from": "26148", "to": "noaddress", "weight": 4900000000}, {"from": "26148", "to": "4900000000", "weight": 100000000}, {"from": "68918", "to": "4800000000", "weight": 100000000}, {"from": "40668", "to": "4900000000", "weight": 100000000}, {"from": "4900000000", "to": "18667", "weight": 100000000}, {"from": "4900000000", "to": "44290", "weight": 100000000}, {"from": "4900000000", "to": "37237", "weight": 100000000}, {"from": "44290", "to": "1M76MmkkZbTsu2CBmx7QQPH9NsaVprBqxv", "weight": 200000000}, {"from": "4800000000", "to": "44290", "weight": 100000000}, {"from": "87114", "to": "18678RbdxmLrQQ5cn2Dwohdk4E2EziTbmb", "weight": 70000000000}, {"from": "18678RbdxmLrQQ5cn2Dwohdk4E2EziTbmb", "to": "101405", "weight": 70000000000}, {"from": "1M76MmkkZbTsu2CBmx7QQPH9NsaVprBqxv", "to": "87114", "weight": 200000000}, {"from": "90181", "to": "19BZkKomveRn1NojEyXhZDWgrsnz5ZGkmJ", "weight": 5000000000}, {"from": "19BZkKomveRn1NojEyXhZDWgrsnz5ZGkmJ", "to": "4987", "weight": 5000000000}, {"from": "663", "to": "19uf6F6EDijkH4ZUaqsi3pZ2SVD6A5RG8X", "weight": 5000000000}, {"from": "19uf6F6EDijkH4ZUaqsi3pZ2SVD6A5RG8X", "to": "29792", "weight": 5000000000}, {"from": "19uf6F6EDijkH4ZUaqsi3pZ2SVD6A5RG8X", "to": "75733", "weight": 200000000000}, {"from": "29792", "to": "noaddress", "weight": 190000000000}, {"from": "6367", "to": "19uf6F6EDijkH4ZUaqsi3pZ2SVD6A5RG8X", "weight": 5000000000}, {"from": "67420", "to": "19uf6F6EDijkH4ZUaqsi3pZ2SVD6A5RG8X", "weight": 5000000000}, {"from": "114716", "to": "19uf6F6EDijkH4ZUaqsi3pZ2SVD6A5RG8X", "weight": 5000000000}, {"from": "103202", "to": "19uf6F6EDijkH4ZUaqsi3pZ2SVD6A5RG8X", "weight": 5000000000}, {"from": "30287", "to": "19uf6F6EDijkH4ZUaqsi3pZ2SVD6A5RG8X", "weight": 5000000000}, {"from": "79421", "to": "19uf6F6EDijkH4ZUaqsi3pZ2SVD6A5RG8X", "weight": 5000000000}, {"from": "48502", "to": "19uf6F6EDijkH4ZUaqsi3pZ2SVD6A5RG8X", "weight": 65000000000}, {"from": "90062", "to": "19uf6F6EDijkH4ZUaqsi3pZ2SVD6A5RG8X", "weight": 5000000000}, {"from": "43301", "to": "19uf6F6EDijkH4ZUaqsi3pZ2SVD6A5RG8X", "weight": 5000000000}, {"from": "55870", "to": "19uf6F6EDijkH4ZUaqsi3pZ2SVD6A5RG8X", "weight": 5000000000}, {"from": "106053", "to": "19uf6F6EDijkH4ZUaqsi3pZ2SVD6A5RG8X", "weight": 5000000000}, {"from": "99598", "to": "19uf6F6EDijkH4ZUaqsi3pZ2SVD6A5RG8X", "weight": 5000000000}, {"from": "111723", "to": "19uf6F6EDijkH4ZUaqsi3pZ2SVD6A5RG8X", "weight": 200000000000}, {"from": "75733", "to": "16m9YMoDrsrk83VygtsunHRb14irKqdcdH", "weight": 200000000000}, {"from": "16m9YMoDrsrk83VygtsunHRb14irKqdcdH", "to": "56096", "weight": 200000000000}, {"from": "56096", "to": "1683000000", "weight": 568317000000}, {"from": "56096", "to": "noaddress", "weight": 1683000000}, {"from": "1683000000", "to": "64213", "weight": 568317000000}, {"from": "64213", "to": "5000000000", "weight": 563317000000}, {"from": "64213", "to": "16DNNJzA4FX5f3so2qpcotc2xQv8DGhQV7", "weight": 5000000000}, {"from": "5000000000", "to": "81722", "weight": 563317000000}, {"from": "81722", "to": "16DNNJzA4FX5f3so2qpcotc2xQv8DGhQV7", "weight": 563317000000}, {"from": "27140", "to": "noaddress", "weight": 2500000000}, {"from": "27140", "to": "2500000000", "weight": 2500000000}, {"from": "13126", "to": "16DNNJzA4FX5f3so2qpcotc2xQv8DGhQV7", "weight": 2500000000}, {"from": "16DNNJzA4FX5f3so2qpcotc2xQv8DGhQV7", "to": "30786", "weight": 5000000000}, {"from": "30786", "to": "1GNyLtivKQrL32S31WswWKVhSvUugGoq9S", "weight": 573317000000}, {"from": "2500000000", "to": "30786", "weight": 2500000000}, {"from": "84269", "to": "1EqbGHoZZ7xdCkiQXW53UWrueQgfGiJDVG", "weight": 5000000000}, {"from": "1EqbGHoZZ7xdCkiQXW53UWrueQgfGiJDVG", "to": "59376", "weight": 5000000000}, {"from": "1EqbGHoZZ7xdCkiQXW53UWrueQgfGiJDVG", "to": "29857", "weight": 5000000000}, {"from": "92262", "to": "1EqbGHoZZ7xdCkiQXW53UWrueQgfGiJDVG", "weight": 5000000000}, {"from": "56367", "to": "1JXFXUBGs2ZtEDAQMdZ3tkCKo38nT2XSEp", "weight": 1337000000}, {"from": "1JXFXUBGs2ZtEDAQMdZ3tkCKo38nT2XSEp", "to": "5669", "weight": 1337000000}, {"from": "1GNyLtivKQrL32S31WswWKVhSvUugGoq9S", "to": "33845", "weight": 573317000000}, {"from": "47339", "to": "1EGDbCKGbizMFgwjn4WNHTvAthsvrsixDv", "weight": 100000000}, {"from": "1EGDbCKGbizMFgwjn4WNHTvAthsvrsixDv", "to": "34538", "weight": 100000000}, {"from": "1EGDbCKGbizMFgwjn4WNHTvAthsvrsixDv", "to": "69449", "weight": 100000000}, {"from": "13528", "to": "1EGDbCKGbizMFgwjn4WNHTvAthsvrsixDv", "weight": 100000000}, {"from": "85422", "to": "1CYdgs3YcoLtf8g9ii7KiPjPMxUrfE6jg1", "weight": 1900000000000}, {"from": "1CYdgs3YcoLtf8g9ii7KiPjPMxUrfE6jg1", "to": "39381", "weight": 1900000000000}, {"from": "39381", "to": "noaddress", "weight": 1383726000000}, {"from": "39381", "to": "1383726000000", "weight": 516274000000}, {"from": "106227", "to": "93000000", "weight": 1398633000000}, {"from": "93000000", "to": "41083", "weight": 1398633000000}, {"from": "1383726000000", "to": "46403", "weight": 516274000000}, {"from": "46005", "to": "noaddress", "weight": 4900000000}, {"from": "1522", "to": "noaddress", "weight": 4998000000}, {"from": "1522", "to": "4998000000", "weight": 2000000}, {"from": "5155", "to": "4997000000", "weight": 1000000}, {"from": "4998000000", "to": "90421", "weight": 2000000}, {"from": "4997000000", "to": "90421", "weight": 1000000}, {"from": "87030", "to": "14rnn1tqFmbmBfHA775rubZAqJ82SyGwwf", "weight": 350000000000}, {"from": "14rnn1tqFmbmBfHA775rubZAqJ82SyGwwf", "to": "41406", "weight": 350000000000}, {"from": "108417", "to": "100000000", "weight": 4900000000}, {"from": "100000000", "to": "36246", "weight": 4900000000}, {"from": "100000000", "to": "64473", "weight": 4900000000}, {"from": "63869", "to": "19FkhipC2hiTeg8QUEie4rG4uTTknGWBiH", "weight": 1000000000000}, {"from": "19FkhipC2hiTeg8QUEie4rG4uTTknGWBiH", "to": "30040", "weight": 1000000000000}, {"from": "92719", "to": "100000000", "weight": 4900000000}]);
+
+        // adding nodes and edges to the graph
+        data = {nodes: nodes, edges: edges};
+
+        var options = {
+    "configure": {
+        "enabled": false
+    },
+    "edges": {
+        "color": {
+            "inherit": true
+        },
+        "smooth": {
+            "enabled": false,
+            "type": "continuous"
+        }
+    },
+    "interaction": {
+        "dragNodes": true,
+        "hideEdgesOnDrag": false,
+        "hideNodesOnDrag": false
+    },
+    "physics": {
+        "enabled": true,
+        "stabilization": {
+            "enabled": true,
+            "fit": true,
+            "iterations": 1000,
+            "onlyDynamicEdges": false,
+            "updateInterval": 50
+        }
+    }
+};
+        
+        
+
+        
+
+        network = new vis.Network(container, data, options);
+	 
+        
+
+
+        
+
+        return network;
+
+    }
+
+    drawGraph();
+
+</script>
+</body>
+</html>
