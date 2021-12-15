@@ -266,7 +266,7 @@ def get_features(batches_24_hr, updated_dict):
                             non_address_set.add(address)
                             label_list.append(0) #append white
                         else:
-                            break
+                            continue
                     else:
                         #print("Ransomware found")
                         label_list.append(1) #append dark
