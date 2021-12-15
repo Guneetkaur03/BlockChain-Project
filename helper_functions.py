@@ -1,5 +1,12 @@
+import os
+import time
+from igraph import *
+import networkx as nx
+from tqdm import tqdm
 from constants import *
-from libraries import *
+from datetime import datetime
+from helper_functions import *
+from joblib import Parallel, delayed
 
 def get_all_hashes_set(file_type):
     """
@@ -168,5 +175,28 @@ def extract_transaction_details(file_type, month):
 
 # def construct_entire_network():
 
-def get_all_24_hrs_window():
-    
+def get_all_24_hrs_window(details):
+    """
+        This function is used to form daily batches of 24hr timeframe
+
+        Args:
+            details (dict): contains network details in timely order
+
+        Returns:
+            (dict): 24hr window batches
+    """
+    batches_24_hr = dict()
+
+    #loop over 24hr timeframe
+    for day, unixtimestamp in tqdm(enumerate(range(UNIXTIMESTAMP_START, UNIXTIMESTAMP_END, TIMEFRAME_24HR))):
+        
+        u_start = unixtimestamp
+        u_end = unixtimestamp + TIMEFRAME_24HR
+
+        batches_24_hr[day] = dict()
+
+        for key, value in details.items():     
+            if int(value['time']) >= u_start and int(value['time']) <= u_end:
+                batches_24_hr[day][key] = value
+
+    return batches_24_hr

@@ -1,32 +1,12 @@
-from libraries import *
+import os
+import time
+from igraph import *
+import networkx as nx
+from tqdm import tqdm
+from constants import *
+from datetime import datetime
 from helper_functions import *
-
-#gathering input details
-start_time = time.time()
-input_details = form_dictionaries("inputs")
-end_time = time.time()
-print("Time taken to read the input file data is {}".format(end_time - start_time))
-
-#gathering output details
-start_time = time.time()
-output_details = form_dictionaries("outputs")
-end_time = time.time()
-print("Time taken to read the output file data is {}".format(end_time - start_time))
-
-#total details present in input and output dictionary
-print("Total details in input dict is: {}".format(len(input_details)))
-print("Total details in output dict is: {}".format(len(output_details)))
-
-#merge input and output dictionary
-start_time = time.time()
-for key, value in output_details.items():
-    input_dict = input_details[key]
-    output_details[key]["input"] = input_dict["input"]
-end_time = time.time()
-print("Time taken to link the data is {}".format(end_time - start_time))
-
-#sorted dictionary in order of time
-updated_dict = dict(sorted(output_details.items(), key=lambda item: item[1]['time']))
+from joblib import Parallel, delayed
 
 
 def main():
@@ -51,8 +31,35 @@ def main():
     #     end_time = time.time()
     #     print("Time taken to construct the whole network is {}".format(end_time - start_time))
 
+    #gathering input details
+    start_time = time.time()
+    input_details = form_dictionaries("inputs")
+    end_time = time.time()
+    print("Time taken to read the input file data is {}".format(end_time - start_time))
+
+    #gathering output details
+    start_time = time.time()
+    output_details = form_dictionaries("outputs")
+    end_time = time.time()
+    print("Time taken to read the output file data is {}".format(end_time - start_time))
+
+    #total details present in input and output dictionary
+    print("Total details in input dict is: {}".format(len(input_details)))
+    print("Total details in output dict is: {}".format(len(output_details)))
+
+    #merge input and output dictionary
+    start_time = time.time()
+    for key, value in output_details.items():
+        input_dict = input_details[key]
+        output_details[key]["input"] = input_dict["input"]
+    end_time = time.time()
+    print("Time taken to link the data is {}".format(end_time - start_time))
+
+    #sorted dictionary in order of time
+    updated_dict = dict(sorted(output_details.items(), key=lambda item: item[1]['time']))
+
     #divide the network in 24 hr windows
-    get_all_24_hrs_window()
+    batches_24_hr = get_all_24_hrs_window(updated_dict)
 
 if __name__ == "__main__":
   main()
