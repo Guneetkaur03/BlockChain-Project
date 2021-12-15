@@ -1,14 +1,14 @@
 from datetime import datetime
 
 #number of months taken into consideration
-MONTH = 12
+MONTH = 1
 
 #Year
-YEAR = 2010
+YEAR = 2013
 
 #DATA_PATH
-DATA_PATH = './Data/edges' + YEAR + '/'
-UPDATED_DATA_PATH = './Data/edges' + YEAR + '/updated/'
+DATA_PATH = './Data/edges' + str(YEAR) + '/'
+UPDATED_DATA_PATH = DATA_PATH + 'updated/'
 
 #CONSTRUCT_ENTIRE_NETWORK = FALSE
 
@@ -22,8 +22,8 @@ else:
 
 UNIXTIMESTAMP_END = int((END_DAY - datetime(1970,1,1)).total_seconds())
 
-TIMEFRAME_24HR = 22* 60 * 60
+TIMEFRAME_24HR = 24* 60 * 60
 
-FEATURES_CSV_FILE = UPDATED_DATA_PATH + "features_" + YEAR +".csv"
+FEATURES_CSV_FILE = UPDATED_DATA_PATH + "features_" + str(YEAR) +".csv"
 
 ADDRESS_NODES_LIMIT = 1000

@@ -1,18 +1,19 @@
 import os
 import csv
 import time
+import pandas as pd
 from igraph import *
 import networkx as nx
 from tqdm import tqdm
 from constants import *
 from datetime import datetime
-from feature_extraction import get_expenditure, get_income, get_length_count_loop, get_neighbors, get_starter_trx
 from helper_functions import *
+from feature_extraction import *
 from joblib import Parallel, delayed
 
 def get_all_hashes_set(file_type):
     """
-        This function is used to get all the hashes across all months
+        This module is used to get all the hashes across all months
 
         Args:
             file_type (str): "inputs" if dealing with input file, else "outputs"
@@ -31,7 +32,7 @@ def get_all_hashes_set(file_type):
 
 def update_all_files(file_type, hash_mappings):
     """
-        This function is used to update all the files of given type
+        This module is used to update all the files of given type
 
         Args:
             file_type (str): "inputs" if dealing with input file, else "outputs"
@@ -49,7 +50,7 @@ def update_all_files(file_type, hash_mappings):
 
 def get_hashes(file_type, month):
     """
-        This function is used to unique hashes for a given month
+        This module is used to unique hashes for a given month
 
         Args:
             file_type (str): "inputs" if dealing with input file, else "outputs"
@@ -60,7 +61,7 @@ def get_hashes(file_type, month):
     hashes = set()
 
     #reading of files depending on the type and month of data
-    filename = DATA_PATH + file_type + YEAR + "_{}.txt".format(str(month+1))
+    filename = DATA_PATH + file_type + str(YEAR) + "_{}.txt".format(str(month+1))
 
     with open(filename) as file:
 
@@ -83,7 +84,7 @@ def get_hashes(file_type, month):
 
 def update_files(file_type, month, hash_mappings):
     """
-        This function is used to update file for given month
+        This module is used to update file for given month
 
         Args:
             file_type (str): "inputs" if dealing with input file, else "outputs"
@@ -92,8 +93,8 @@ def update_files(file_type, month, hash_mappings):
     """
 
     #read files
-    filename = DATA_PATH + file_type + YEAR + "_{}.txt".format(str(month+1))
-    updated_filename = UPDATED_DATA_PATH + file_type + YEAR + "_{}.txt".format(str(month+1))
+    filename = DATA_PATH + file_type + str(YEAR) + "_{}.txt".format(str(month+1))
+    updated_filename = UPDATED_DATA_PATH + file_type + str(YEAR) + "_{}.txt".format(str(month+1))
 
     file = open(filename, 'r')
     updated_file = open(updated_filename, 'w')
@@ -117,7 +118,7 @@ def update_files(file_type, month, hash_mappings):
 
 def form_dictionaries(file_type):
     """
-        This function is used to create dictionaries for all month
+        This module is used to create dictionaries for all month
 
         Args:
             file_type (str): "inputs" if dealing with input file, else "outputs"
@@ -135,7 +136,7 @@ def form_dictionaries(file_type):
 
 def extract_transaction_details(file_type, month):
     """
-        This function is used to extract the transaction details
+        This module is used to extract the transaction details
 
         Args:
             file_type (str): "inputs" if dealing with input file, else "outputs"
@@ -149,7 +150,7 @@ def extract_transaction_details(file_type, month):
     trx_details = dict()
 
     #reading of files depending on the type and month of data
-    filename = UPDATED_DATA_PATH + file_type + YEAR + "_{}.txt".format(str(month+1))
+    filename = UPDATED_DATA_PATH + file_type + str(YEAR) + "_{}.txt".format(str(month+1))
 
     with open(filename) as file:
 
@@ -160,18 +161,18 @@ def extract_transaction_details(file_type, month):
             line = line.replace('\n', '')
             details = line.split("\t")
 
-        #adding details in the dictionary
-        hash_of_trx = details[1]
-        trx_details[hash_of_trx] = dict()
+            #adding details in the dictionary
+            hash_of_trx = details[1]
+            trx_details[hash_of_trx] = dict()
 
-        #add input details
-        if file_type == "inputs":
-            trx_details[details[1]]["input"] = details[2:]
+            #add input details
+            if file_type == "inputs":
+                trx_details[details[1]]["input"] = details[2:]
 
-        #add output details
-        if file_type == "outputs":
-            trx_details[details[1]]["output"] = details[2:]
-            trx_details[details[1]]["time"] = details[0]
+            #add output details
+            if file_type == "outputs":
+                trx_details[details[1]]["output"] = details[2:]
+                trx_details[details[1]]["time"] = details[0]
 
     return trx_details
 
@@ -179,7 +180,7 @@ def extract_transaction_details(file_type, month):
 
 def get_all_24_hrs_window(details):
     """
-        This function is used to form daily batches of 24hr timeframe
+        This module is used to form daily batches of 24hr timeframe
 
         Args:
             details (dict): contains network details in timely order
@@ -205,9 +206,17 @@ def get_all_24_hrs_window(details):
 
 
 def get_features(batches_24_hr, updated_dict):
+    """
+    This module is used to extract features from 24hr windows
+
+    Args:
+        batches_24_hr (dict): batches of 24hr windows
+        updated_dict (dict): sorted dictionary containing all details
+    """
 
     # open the file in the write mode
     f = open(FEATURES_CSV_FILE, 'w')
+
     # create the csv writer
     writer = csv.writer(f)
     #header row
@@ -271,41 +280,82 @@ def get_features(batches_24_hr, updated_dict):
         #pick address nodes
         addr_list  = [node for node in ig.vs.indices if ig.vs[node]['label'] == "address"]
         #limiting address nodes to 1K
-        addr_list  = addr_list[:ADDRESS_NODES_LIMIT]            
+        addr_list  = get_truncated_address_list(ig, addr_list, ADDRESS_NODES_LIMIT)            
         #pick only transaction nodes 
         trans_list = [node for node in ig.vs.indices if ig.vs[node]['label'] == "transaction"]
 
-    #get incomes feature
-    income_list = []
-    incomes = Parallel(n_jobs=-1)(delayed(get_income)(ig, address) for address in tqdm(addr_list))
-    for income in incomes:
-        income_list.append(income)
+        #get incomes feature
+        income_list = []
+        incomes = Parallel(n_jobs=-1)(delayed(get_income)(ig, address) for address in addr_list)
+        for income in incomes:
+            income_list.append(income)
 
-    #get expenditure feature
-    expenditure_list = []
-    expenditures = Parallel(n_jobs=-1)(delayed(get_expenditure)(ig, address) for address in tqdm(addr_list))
-    for expenditure in expenditures:
-        expenditure_list.append(expenditure)
+        #get expenditure feature
+        expenditure_list = []
+        expenditures = Parallel(n_jobs=-1)(delayed(get_expenditure)(ig, address) for address in addr_list)
+        for expenditure in expenditures:
+            expenditure_list.append(expenditure)
 
-    #get starter transactions
-    starter_trx = get_starter_trx(ig, trans_list)
+        #get starter transactions
+        starter_trx = get_starter_trx(ig, trans_list)
 
-    #get neighbors
-    neighbor_list = []
-    neighbors = Parallel(n_jobs=-1)(delayed(get_neighbors)(ig, address) for address in tqdm(addr_list))
-    for neighbor in neighbors:
-        neighbor_list.append(neighbor)
+        #get neighbors
+        neighbor_list = []
+        neighbors = Parallel(n_jobs=-1)(delayed(get_neighbors)(ig, address) for address in addr_list)
+        for neighbor in neighbors:
+            neighbor_list.append(neighbor)
 
-    #get length, loop and count
-    length_list  = []
-    count_list = []
-    loops_list = []
-    inp = Parallel(n_jobs=-1)(delayed(get_length_count_loop)(ig, addr, starter_trx) for addr in tqdm(addr_list))
-    for d in inp:
-        length_list.append(d[0])
-        count_list.append(d[1])
-        loops_list.append(d[2])
-    
-    for i in range(len(address_list)):
-        #append row in features file
-        writer.writerow([day, address_list[i], income_list[i], expenditure_list[i], neighbor_list[i], length_list[i], count_list[i], loops_list[i]])
+        #get length, loop and count
+        length_list  = []
+        count_list = []
+        loops_list = []
+        inp = Parallel(n_jobs=-1)(delayed(get_length_count_loop)(ig, addr, starter_trx) for addr in addr_list)
+        for d in inp:
+            length_list.append(d[0])
+            count_list.append(d[1])
+            loops_list.append(d[2])
+        
+        for i in range(len(address_list)):
+            #append row in features file
+            writer.writerow([day, address_list[i], income_list[i], expenditure_list[i], neighbor_list[i], length_list[i], count_list[i], loops_list[i]])
+
+def get_ransom_addresses():
+    """
+    This module is used to get the list of ransom addresses
+
+    Returns:
+        (list) : ransomware addresses
+    """
+    filepath = UPDATED_DATA_PATH + 'ransom_only.csv'
+    df_ransom = pd.read_csv(filepath)
+
+    return list(df_ransom.address.values)
+
+def get_truncated_address_list(g, addresses, n = 1000):
+    """
+        This module checks the addresses in the list and picks all the
+        ransoms. For non-ransoms it trancates it to n entries
+        Args:
+            g (graph) : graph object
+            addresses (list) : list of addresses
+            n (int) : number of entries for non ransom addresses
+        Returns:
+            (list): list of truncated addresses
+    """
+    ransom           = []
+    non_ransom       = []
+    ransom_addresses = get_ransom_addresses()
+
+    for address in addresses:
+        if g.vs[address]["_nx_name"] in ransom_addresses:
+            ransom.append(address)
+        else:
+            non_ransom.append(address)
+
+    if len(ransom) > 0:
+        print(len(ransom))
+
+    all_addresses = non_ransom[:n]
+    all_addresses.extend(ransom)
+
+    return all_addresses

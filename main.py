@@ -12,18 +12,18 @@ from joblib import Parallel, delayed
 
 def main():
 
-    #get all the hashes from the input file as it contains transaction hashes
-    hashes = get_all_hashes_set("inputs")
+    # #get all the hashes from the input file as it contains transaction hashes
+    # hashes = get_all_hashes_set("inputs")
 
-    #create mappings
-    hash_mappings = {hash : id for id, hash in enumerate(hashes)}
+    # #create mappings
+    # hash_mappings = {hash : id for id, hash in enumerate(hashes)}
 
-    #update the files using hash_mappings
-    #for inputs
-    update_all_files("inputs", hash_mappings)
+    # #update the files using hash_mappings
+    # #for inputs
+    # update_all_files("inputs", hash_mappings)
 
-    #for outputs
-    update_all_files("outputs", hash_mappings)
+    # #for outputs
+    # update_all_files("outputs", hash_mappings)
 
     # if CONSTRUCT_ENTIRE_NETWORK:
     #     start_time = time.time()
@@ -60,7 +60,10 @@ def main():
     updated_dict = dict(sorted(output_details.items(), key=lambda item: item[1]['time']))
 
     #divide the network in 24 hr windows
+    start_time = time.time()
     batches_24_hr = get_all_24_hrs_window(updated_dict)
+    end_time = time.time()
+    print("Time taken to get 24 hr windows is {}".format(end_time - start_time))
 
     #extract features and write in file
     start_time = time.time()
