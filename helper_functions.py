@@ -220,25 +220,29 @@ def get_features(batches_24_hr, updated_dict):
     # create the csv writer
     writer = csv.writer(f)
     #header row
-    writer.writerow(['day', 'address', 'income', 'expenditure', 'neighbors', 'lengths', 'counts', 'loops'])
+    writer.writerow(['day', 'address', 'income', 'expenditure', 'neighbors', 'lengths', 'counts', 'loops', 'label'])
+
+    day = 0
+
+    ransom_addresses = get_ransom_addresses()
 
     for m_key, m_value in tqdm(batches_24_hr.items()):
 
-        day = m_key
+        day += 1
         details = m_value
 
         #create graph
         g = nx.DiGraph()
 
-        address_list = []
-
+        label_list = []
+    
+        non_address_set = set()
+    
         for key, value in details.items():
             
             hash_of_transc = key
 
             input_details_of_hash_of_transc  = value["input"]
-            output_details_of_hash_of_transc = value["output"]
-            time = value["time"]
 
             #print("Transaction input details {}".format(input_details_of_hash_of_transc))
             #print("Transaction output details {}".format(output_details_of_hash_of_transc))
@@ -256,7 +260,17 @@ def get_features(batches_24_hr, updated_dict):
 
                     address = get_amounts[2*int(output_index)]
                     amount  = get_amounts[2*int(output_index)+1]
-                
+                    
+                    if address not in ransom_addresses:
+                        if len(non_address_set) < ADDRESS_NODES_LIMIT and address not in non_address_set:
+                            non_address_set.add(address)
+                            label_list.append(0) #append white
+                        else:
+                            break
+                    else:
+                        #print("Ransomware found")
+                        label_list.append(1) #append dark
+
                     #add input transaction node
                     g.add_node(input_hash, s='s', label='transaction', color="r", time=time)
                                 
@@ -272,38 +286,27 @@ def get_features(batches_24_hr, updated_dict):
                     #add edge between address and output transaction
                     g.add_edge(address, key, weight=int(amount))
                 
-                address_list.append(address)
 
         #convert to igraph for faster computations
         ig = Graph.from_networkx(g)
     
         #pick address nodes
         addr_list  = [node for node in ig.vs.indices if ig.vs[node]['label'] == "address"]
-        #limiting address nodes to 1K
-        addr_list  = get_truncated_address_list(ig, addr_list, ADDRESS_NODES_LIMIT)            
+
         #pick only transaction nodes 
         trans_list = [node for node in ig.vs.indices if ig.vs[node]['label'] == "transaction"]
 
         #get incomes feature
-        income_list = []
-        incomes = Parallel(n_jobs=-1)(delayed(get_income)(ig, address) for address in addr_list)
-        for income in incomes:
-            income_list.append(income)
+        income_list = get_income(ig, addr_list)
 
         #get expenditure feature
-        expenditure_list = []
-        expenditures = Parallel(n_jobs=-1)(delayed(get_expenditure)(ig, address) for address in addr_list)
-        for expenditure in expenditures:
-            expenditure_list.append(expenditure)
+        expenditure_list = get_expenditure(ig, addr_list)
 
         #get starter transactions
         starter_trx = get_starter_trx(ig, trans_list)
 
         #get neighbors
-        neighbor_list = []
-        neighbors = Parallel(n_jobs=-1)(delayed(get_neighbors)(ig, address) for address in addr_list)
-        for neighbor in neighbors:
-            neighbor_list.append(neighbor)
+        neighbor_list = get_neighbors(ig, addr_list)
 
         #get length, loop and count
         length_list  = []
@@ -315,10 +318,13 @@ def get_features(batches_24_hr, updated_dict):
             count_list.append(d[1])
             loops_list.append(d[2])
         
-        for i in range(len(address_list)):
+        for i in range(len(addr_list)):
+            print("appending")
             #append row in features file
-            writer.writerow([day, address_list[i], income_list[i], expenditure_list[i], neighbor_list[i], length_list[i], count_list[i], loops_list[i]])
-
+            writer.writerow([day, ig.vs[addr_list[i]]["_nx_name"], income_list[i], \
+                         expenditure_list[i], neighbor_list[i], length_list[i], \
+                         count_list[i], loops_list[i], label_list[i]])
+                         
 def get_ransom_addresses():
     """
     This module is used to get the list of ransom addresses

@@ -1,6 +1,6 @@
-def get_income(g, address):
+def get_income(g, addresses):
     """
-        This function is used to generate income feature of the address.
+        This module is used to generate income feature of the address.
         Income of an address u is calculated as the total amount of coins output to u.
 
         Args:
@@ -8,25 +8,27 @@ def get_income(g, address):
             address (str): id of address
 
         Returns:
-            (int): income amount 
+            (list): income amounts
     """
+    address_income = []
 
-    #find all the predecessor for address
-    all_predeccesors = list(g.predecessors(address))
+    for address in addresses:
+        #find all the predecessor for address
+        all_predeccesors = list(g.predecessors(address))
 
-    #loop over all predecessors to compute the incoming amount to address using the weight of incoming edges
-    #we get list of all incoming amounts
-    incomes = [g.es[g.get_eid(predecessor,address)]["weight"] for predecessor in all_predeccesors]
+        #loop over all predecessors to compute the incoming amount to address using the weight of incoming edges
+        #we get list of all incoming amounts
+        incomes = [g.es[g.get_eid(predecessor,address)]["weight"] for predecessor in all_predeccesors]
 
-    #store the sum of incoming amount
-    address_income = sum(incomes)
+        #store the sum of incoming amount
+        address_income.append(sum(incomes))
 
     return address_income
     
 
-def get_expenditure(g, address):
+def get_expenditure(g, addresses):
     """
-        This function is used to generate expenditure feature of the address.
+        This module is used to generate expenditure feature of the address.
         Expenditure of an address u is calculated as the total amount of coins output from u.
 
         Args:
@@ -34,24 +36,27 @@ def get_expenditure(g, address):
             address (str): id of address
 
         Returns:
-            (int): expenditure amount 
+            (list): expenditure amounts 
     """
+    address_expenditure = []
 
-    #find all the successors for address
-    all_successors = list(g.successors(address))
+    for address in addresses:
 
-    #loop over all successors to compute the expenditure using the weight of outgoing edges
-    #we get list of all outgoing amounts
-    expenditures = [g.es[g.get_eid(address,successor)]["weight"] for successor in all_successors]
+        #find all the successors for address
+        all_successors = list(g.successors(address))
 
-    #store the sum of outgoing amount
-    address_expenditure = sum(expenditures)
+        #loop over all successors to compute the expenditure using the weight of outgoing edges
+        #we get list of all outgoing amounts
+        expenditures = [g.es[g.get_eid(address,successor)]["weight"] for successor in all_successors]
+
+        #store the sum of outgoing amount
+        address_expenditure.append(sum(expenditures))
 
     return address_expenditure
 
-def get_neighbors(g, address):
+def get_neighbors(g, addresses):
     """
-        This function is used to extract the neighbors feature of an address
+        This module is used to extract the neighbors feature of an address
         Neighbors of an address u is the number of transactions which have u as one of its output addresses
 
         Args:
@@ -59,21 +64,23 @@ def get_neighbors(g, address):
             address (str): id of address
 
         Returns:
-            (int): number of neighbors
+            (list): list of neighbors
     """
+    address_neighbors = []
 
-    #list of all neighbors
-    neighbors = [1 for p in g.predecessors(address) if g.vs[p]['label'] == "transaction"]
+    for address in addresses:
+        #list of all neighbors
+        neighbors = [1 for p in g.predecessors(address) if g.vs[p]['label'] == "transaction"]
 
-    #store the count of neighbors
-    address_neighbors = len(neighbors)
+        #store the count of neighbors
+        address_neighbors.append(len(neighbors))
 
     return address_neighbors
 
 
 def get_starter_trx(g,transactions):
     """
-        This function is used to get all the starter transactions in a graph
+        This module is used to get all the starter transactions in a graph
         These are the set of transactions that do not receive outputs from any 
         earlier transaction.
 

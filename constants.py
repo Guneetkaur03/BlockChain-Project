@@ -1,10 +1,10 @@
 from datetime import datetime
 
 #number of months taken into consideration
-MONTH = 1
+MONTH = 12
 
 #Year
-YEAR = 2013
+YEAR = 2010
 
 #DATA_PATH
 DATA_PATH = './Data/edges' + str(YEAR) + '/'
@@ -26,4 +26,4 @@ TIMEFRAME_24HR = 24* 60 * 60
 
 FEATURES_CSV_FILE = UPDATED_DATA_PATH + "features_" + str(YEAR) +".csv"
 
-ADDRESS_NODES_LIMIT = 1000
+ADDRESS_NODES_LIMIT = 10
