@@ -25,3 +25,5 @@ UNIXTIMESTAMP_END = int((END_DAY - datetime(1970,1,1)).total_seconds())
 TIMEFRAME_24HR = 22* 60 * 60
 
 FEATURES_CSV_FILE = UPDATED_DATA_PATH + "features_" + YEAR +".csv"
+
+ADDRESS_NODES_LIMIT = 1000

@@ -1,10 +1,12 @@
 import os
+import csv
 import time
 from igraph import *
 import networkx as nx
 from tqdm import tqdm
 from constants import *
 from datetime import datetime
+from feature_extraction import get_expenditure, get_income, get_length_count_loop, get_neighbors, get_starter_trx
 from helper_functions import *
 from joblib import Parallel, delayed
 
@@ -200,3 +202,110 @@ def get_all_24_hrs_window(details):
                 batches_24_hr[day][key] = value
 
     return batches_24_hr
+
+
+def get_features(batches_24_hr, updated_dict):
+
+    # open the file in the write mode
+    f = open(FEATURES_CSV_FILE, 'w')
+    # create the csv writer
+    writer = csv.writer(f)
+    #header row
+    writer.writerow(['day', 'address', 'income', 'expenditure', 'neighbors', 'lengths', 'counts', 'loops'])
+
+    for m_key, m_value in tqdm(batches_24_hr.items()):
+
+        day = m_key
+        details = m_value
+
+        #create graph
+        g = nx.DiGraph()
+
+        address_list = []
+
+        for key, value in details.items():
+            
+            hash_of_transc = key
+
+            input_details_of_hash_of_transc  = value["input"]
+            output_details_of_hash_of_transc = value["output"]
+            time = value["time"]
+
+            #print("Transaction input details {}".format(input_details_of_hash_of_transc))
+            #print("Transaction output details {}".format(output_details_of_hash_of_transc))
+
+            #going over all input details
+            for i in range(0, len(input_details_of_hash_of_transc), 2):
+                input_hash   = input_details_of_hash_of_transc[i]
+                output_index = input_details_of_hash_of_transc[i+1]
+            
+                if input_hash not in updated_dict.keys():
+                    pass
+                else:
+                    #get output details of that input transaction
+                    get_amounts = updated_dict[input_hash]["output"]
+
+                    address = get_amounts[2*int(output_index)]
+                    amount  = get_amounts[2*int(output_index)+1]
+                
+                    #add input transaction node
+                    g.add_node(input_hash, s='s', label='transaction', color="r", time=time)
+                                
+                    #add address node
+                    g.add_node(address, s ='s', label='address', color="b")
+
+                    #add output transaction node
+                    g.add_node(hash_of_transc, s='o', label='transaction', color="r", time=time)
+                    
+                    #add edge between input transaction and address
+                    g.add_edge(input_hash, address, weight=int(amount))
+
+                    #add edge between address and output transaction
+                    g.add_edge(address, key, weight=int(amount))
+                
+                address_list.append(address)
+
+        #convert to igraph for faster computations
+        ig = Graph.from_networkx(g)
+    
+        #pick address nodes
+        addr_list  = [node for node in ig.vs.indices if ig.vs[node]['label'] == "address"]
+        #limiting address nodes to 1K
+        addr_list  = addr_list[:ADDRESS_NODES_LIMIT]            
+        #pick only transaction nodes 
+        trans_list = [node for node in ig.vs.indices if ig.vs[node]['label'] == "transaction"]
+
+    #get incomes feature
+    income_list = []
+    incomes = Parallel(n_jobs=-1)(delayed(get_income)(ig, address) for address in tqdm(addr_list))
+    for income in incomes:
+        income_list.append(income)
+
+    #get expenditure feature
+    expenditure_list = []
+    expenditures = Parallel(n_jobs=-1)(delayed(get_expenditure)(ig, address) for address in tqdm(addr_list))
+    for expenditure in expenditures:
+        expenditure_list.append(expenditure)
+
+    #get starter transactions
+    starter_trx = get_starter_trx(ig, trans_list)
+
+    #get neighbors
+    neighbor_list = []
+    neighbors = Parallel(n_jobs=-1)(delayed(get_neighbors)(ig, address) for address in tqdm(addr_list))
+    for neighbor in neighbors:
+        neighbor_list.append(neighbor)
+
+    #get length, loop and count
+    length_list  = []
+    count_list = []
+    loops_list = []
+    inp = Parallel(n_jobs=-1)(delayed(get_length_count_loop)(ig, addr, starter_trx) for addr in tqdm(addr_list))
+    for d in inp:
+        length_list.append(d[0])
+        count_list.append(d[1])
+        loops_list.append(d[2])
+    
+    for i in range(len(address_list)):
+        #append row in features file
+        writer.writerow([day, address_list[i], income_list[i], expenditure_list[i], neighbor_list[i], length_list[i], count_list[i], loops_list[i]])

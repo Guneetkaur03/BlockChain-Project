@@ -1,4 +1,5 @@
 import os
+import csv
 import time
 from igraph import *
 import networkx as nx
@@ -60,6 +61,12 @@ def main():
 
     #divide the network in 24 hr windows
     batches_24_hr = get_all_24_hrs_window(updated_dict)
+
+    #extract features and write in file
+    start_time = time.time()
+    get_features(batches_24_hr, updated_dict)
+    end_time = time.time()
+    print("Time taken to extract features is {}".format(end_time - start_time))
 
 if __name__ == "__main__":
   main()
