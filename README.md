@@ -34,7 +34,7 @@ One can change values in _constants.py_ as per requirements.
 ### Flow of the code
 The code starts from _main.py_ and is divided into modules depending on the following steps. Figure explains the flow of the code
 ****
-![plot](plots/blockchain_diagram.png)
+![plot](plots/blockchain_diagram.png =250x250)
 
 [//]: # "Limitations"
 ### Limitations
@@ -46,7 +46,7 @@ The code has the following shortcomings
 [//]: # "Results"
 ### Results
 > t step accuracy 
-![plot](plots/accuracy.png)
+![plot](plots/accuracy.png =250x250)
 
 > precision recall graph comparison 
 > - towards the start of training
