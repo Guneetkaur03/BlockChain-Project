@@ -61,8 +61,4 @@ The code has the following shortcomings
 ### References
 - A [1]: http://chartalist.org/BitcoinData.html
 - A [2]: http://www.chartalist.org/btc/TaskTypePrediction.html
-<<<<<<< Updated upstream
 ****
-=======
-****
->>>>>>> Stashed changes
